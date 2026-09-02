@@ -103,3 +103,25 @@ class TestCourierCreation:
         courier_id = login_response.json().get('id')
         if courier_id:
             delete_courier(courier_id)
+
+    def test_courier_creation_without_first_name(self):
+        """Проверка: firstName опциональное поле"""
+        login = generate_random_string(10)
+        password = generate_random_string(10)
+
+        payload = {
+            "login": login,
+            "password": password
+        }
+
+        response = requests.post(f'{BASE_URL}/courier', json=payload)
+
+        # firstName опциональное - курьер создаётся и без него
+        assert response.status_code == 201
+        assert response.json() == {"ok": True}
+
+        # Очищаем данные
+        login_response = login_courier(login, password)
+        courier_id = login_response.json().get('id')
+        if courier_id:
+            delete_courier(courier_id)
