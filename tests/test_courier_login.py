@@ -2,8 +2,7 @@ from helper import (
     login_courier,
     delete_courier,
     register_new_courier_and_return_login_password,
-    BASE_URL,
-    generate_random_string
+    BASE_URL
 )
 import requests
 
