@@ -1,44 +1,33 @@
 import pytest
-from helper import register_new_courier_and_return_login_password, login_courier, delete_courier
-
+import requests
+from helper import login_courier, delete_courier, generate_random_string
+from config import BASE_URL
 
 @pytest.fixture
 def new_courier():
     """
-    Fixture: создаёт нового курьера перед тестом и удаляет после.
-    Возвращает кортеж (login, password, first_name, courier_id)
-    """
-    courier_data = register_new_courier_and_return_login_password()
+        Fixture: создаёт нового курьера перед тестом и удаляет после.
+        Возвращает (login, password, first_name, courier_id)
+        """
+    login = generate_random_string(10)
+    password = generate_random_string(10)
+    first_name = generate_random_string(10)
 
-    if courier_data:
-        login, password, first_name = courier_data
+    payload = {
+        "login": login,
+        "password": password,
+        "firstName": first_name,
+    }
 
-        # Получаем ID курьера через логин
-        login_response = login_courier(login, password)
-        courier_id = login_response.json().get('id')
+    # Создаём курьера
+    response = requests.post(f'{BASE_URL}/courier', json=payload)
 
-        yield login, password, first_name, courier_id
+    # Логинимся и получаем ID
+    login_response = login_courier(login, password)
+    courier_id = login_response.json().get('id')
 
-        # Удаляем курьера после теста
-        if courier_id:
-            delete_courier(courier_id)
-    else:
-        yield None
+    # Отдаём данные тесту
+    yield login, password, first_name, courier_id
 
-
-@pytest.fixture
-def courier_for_deletion():
-    """
-    Fixture: создаёт курьера для тестов удаления.
-    Возвращает (login, password, id)
-    """
-    courier_data = register_new_courier_and_return_login_password()
-
-    if courier_data:
-        login, password, first_name = courier_data
-        login_response = login_courier(login, password)
-        courier_id = login_response.json().get('id')
-
-        yield login, password, courier_id
-    else:
-        yield None
+    # ОЧИЩАЕМ - удаляем курьера ВСЕГДА (без if!)
+    delete_courier(courier_id)

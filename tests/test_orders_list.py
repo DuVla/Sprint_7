@@ -1,8 +1,11 @@
 import requests
-from helper import BASE_URL
+import allure
+from config import BASE_URL
 
 class TestOrderList:
     """Тесты для получения списка заказов"""
+
+    @allure.step("Тест: список заказов возвращается")
     def test_get_orders_list_return_list(self):
         """в тело ответа возвращается список заказов"""
         response = requests.get(f'{BASE_URL}/orders')
@@ -13,11 +16,13 @@ class TestOrderList:
         # Проверяем orders это список
         assert isinstance(response.json()['orders'], list)
 
+    @allure.step("Тест: статус код 200")
     def test_get_orders_list_correct_status_code(self):
         """получение списка заказов возвращает код 200"""
         response = requests.get(f'{BASE_URL}/orders')
         assert response.status_code == 200
 
+    @allure.step("Тест: ответ в формате JSON")
     def test_get_orders_list_response_is_json(self):
         """проверка json"""
         response = requests.get(f'{BASE_URL}/orders')
@@ -26,6 +31,7 @@ class TestOrderList:
         data = response.json()
         assert isinstance(data, dict)
 
+    @allure.step("Тест: массив заказов в ответе")
     def test_get_orders_list_returns_orders_array(self):
         """в ответе находится массив заказов"""
         response = requests.get(f'{BASE_URL}/orders')
@@ -37,6 +43,7 @@ class TestOrderList:
         orders = data['orders']
         assert isinstance(orders, list)
 
+    @allure.step("Тест: список может быть пустым или заполненным")
     def test_get_orders_list_empty_or_populated(self):
         """Проверка: список заказов может быть пустым или заполненным"""
         response = requests.get(f'{BASE_URL}/orders')
