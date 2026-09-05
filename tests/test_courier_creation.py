@@ -52,7 +52,7 @@ class TestCourierCreation:
         response = requests.post(f'{BASE_URL}/courier', json=payload)
 
         assert response.status_code == 409
-        assert 'message' in response.json()
+        assert response.json()['message'] == 'Этот логин уже используется. Попробуйте другой.'
 
         # Очищаем
         login_response = login_courier(login, password)
@@ -73,7 +73,7 @@ class TestCourierCreation:
 
         # Должен вернуть 400
         assert response.status_code == 400
-        assert 'message' in response.json()
+        assert response.json()['message'] == 'Недостаточно данных для создания учетной записи'
 
     @allure.step("Тест: без логина ошибка")
     def test_courier_creation_without_login(self):
@@ -88,8 +88,9 @@ class TestCourierCreation:
         response = requests.post(f'{BASE_URL}/courier', json=payload)
 
         # Должен вернуть 400
+
         assert response.status_code == 400
-        assert 'message' in response.json()
+        assert response.json()['message'] == 'Недостаточно данных для создания учетной записи'
 
     @allure.step("Тест: дубликат логина ошибка")
     def test_duplicate_login_returns_error(self):
@@ -117,7 +118,7 @@ class TestCourierCreation:
         response = requests.post(f'{BASE_URL}/courier', json=payload2)
 
         assert response.status_code == 409
-        assert 'message' in response.json()
+        assert response.json()['message'] == 'Этот логин уже используется. Попробуйте другой.'
 
         # Очищаем
         login_response = login_courier(login, password1)
